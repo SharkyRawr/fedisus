@@ -1,20 +1,28 @@
 import json
+import json.decoder
 
 import requests
+import typing
 
 from instances import JUST_A_RANDOM_LIST_OF_INSTANCES
 from quicktype_types import *
 
-NODEINFO_URL = '/nodeinfo/2.1.json'
+NODEINFO_URL = '/nodeinfo/2.0.json'
 
 
-def get_nodeinfo(node: str) -> NodeInfo:
-    r = requests.get('https://{}{}'.format(node, NODEINFO_URL))
-    r.raise_for_status()
-
-    ni = node_info_from_dict(json.loads(r.text))
-
-    return ni
+def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
+    url = 'https://{}{}'.format(node, NODEINFO_URL)
+    print("Trying to fetch:", url)
+    
+    try:
+        r = requests.get(url, timeout=5)
+        r.raise_for_status()
+        ni = node_info20_from_dict(json.loads(r.text))
+        return ni
+    except requests.RequestException as rex:
+        print(rex)
+    except json.decoder.JSONDecodeError as jsonex:
+        print(jsonex)
 
 
 if __name__ == '__main__':
@@ -24,7 +32,12 @@ if __name__ == '__main__':
 
         for nodeaddress in JUST_A_RANDOM_LIST_OF_INSTANCES:
             ni = get_nodeinfo(nodeaddress)
+            if ni is None:
+                print("skip invalid request result")
+                continue
 
             fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
+            print('>', nodeaddress, fi.NodeName)
             db.session.add(fi)
             db.session.commit()
+
