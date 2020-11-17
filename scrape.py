@@ -17,8 +17,10 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
     try:
         r = requests.get(url, timeout=5)
         r.raise_for_status()
-        ni = node_info20_from_dict(json.loads(r.text))
-        return ni
+        obj = json.loads(r.text)
+        if isinstance(obj, dict):
+            ni = node_info20_from_dict(obj)
+            return ni
     except requests.RequestException as rex:
         print(rex)
     except json.decoder.JSONDecodeError as jsonex:
