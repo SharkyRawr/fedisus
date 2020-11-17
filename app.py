@@ -1,6 +1,5 @@
 import typing
 from collections import OrderedDict
-from typing import OrderedDict
 from models import FediInstance
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
