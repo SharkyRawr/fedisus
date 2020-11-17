@@ -9,6 +9,13 @@
 <p>Number of instances with MRF policies set: {{stats.nummrf}}</p>
 <p>Number of instances with MRF <i>reject</i> set: {{stats.numreject}}</p>
 
+<h3>MRF reject popularity:</h3>
+<ul>
+    {% for rp, n in reject_popularity.items() %}
+    <li>{{rp}} - {{n}}x</li>
+    {% endfor %}
+</ul>
+
 <h3>Instances with rejects:</h3>
 <ul>
     {% for r in rejects %}

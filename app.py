@@ -1,3 +1,6 @@
+import typing
+from collections import OrderedDict
+from typing import OrderedDict
 from models import FediInstance
 from flask import Flask, render_template, request, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
@@ -14,6 +17,18 @@ def index():
 
     with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
 
+    def count_reject_popularity(instances: typing.List[FediInstance]):
+        import operator
+        r = {}
+        for i in instances:
+            rej = i.MRF_Reject.split(', ')
+            for reject in rej:
+                if reject in r:
+                    r[reject] += 1
+                else:
+                    r[reject] = 1
+        return OrderedDict(sorted(r.items(), key=operator.itemgetter(1), reverse=True))
+
     ctx = {
         'stats': {
             'numinstances': FediInstance.query.count(),
@@ -21,6 +36,7 @@ def index():
             'numreject': with_reject.count(),
         },
         'rejects': with_reject.all(),
+        'reject_popularity': count_reject_popularity(with_reject.all())
     }
 
     return render_template('simple_index.html', **ctx)
