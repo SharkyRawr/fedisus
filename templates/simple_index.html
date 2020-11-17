@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+
+<h1>FediSus<small> - trying to find suspect fediverse instances</small></h1>
+
+<p>Number of instances scraped successfully: {{stats.numinstances}}</p>
+<p>Number of instances with MRF policies set: {{stats.nummrf}}</p>
+<p>Number of instances with MRF <i>reject</i> set: {{stats.numreject}}</p>
+
+<h3>Instances with rejects:</h3>
+<ul>
+    {% for r in rejects %}
+    {% set reject_list = r.MRF_Reject.split(', ') %}
+    <li><strong>{{r.Address}}</strong> &rarr; <br>{% for rj in reject_list %}{{rj}}<br>{%endfor%}<br></li>
+    {% endfor %}
+</ul>
+
+{% endblock %}

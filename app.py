@@ -11,7 +11,19 @@ db.init_app(app)
 
 @app.route('/')
 def index():
-    return "hello world"
+
+    with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
+
+    ctx = {
+        'stats': {
+            'numinstances': FediInstance.query.count(),
+            'nummrf': FediInstance.query.filter(FediInstance.MRF_Policies != None).count(),
+            'numreject': with_reject.count(),
+        },
+        'rejects': with_reject.all(),
+    }
+
+    return render_template('simple_index.html', **ctx)
 
 
 
