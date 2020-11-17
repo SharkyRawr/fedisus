@@ -5,11 +5,13 @@
 
 <h1>FediSus<small> - trying to find suspect fediverse instances</small></h1>
 
+<p><strong>Last update: {{last_update}}</strong></p>
+
 <p>Number of instances scraped successfully: {{stats.numinstances}}</p>
 <p>Number of instances with MRF policies set: {{stats.nummrf}}</p>
 <p>Number of instances with MRF <i>reject</i> set: {{stats.numreject}}</p>
 
-<h3>MRF reject popularity:</h3>
+<h3>MRF reject popularity:<br><small>Not showing instances that were blocked only once!</small></h3>
 <small>Apparently its cool to hate on these guys (remember that instances may be blocked for legit and illegitimate reasons, cast your own judgement):</small>
 <ul>
     {% for rp, n in reject_popularity.items() %}

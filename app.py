@@ -26,6 +26,10 @@ def index():
                     r[reject] += 1
                 else:
                     r[reject] = 1
+
+        for k in list(r.keys()):
+            if r[k] <= 1:
+                del r[k]
         return OrderedDict(sorted(r.items(), key=operator.itemgetter(1), reverse=True))
 
     ctx = {
@@ -35,7 +39,8 @@ def index():
             'numreject': with_reject.count(),
         },
         'rejects': with_reject.all(),
-        'reject_popularity': count_reject_popularity(with_reject.all())
+        'reject_popularity': count_reject_popularity(with_reject.all()),
+        'last_update': FediInstance.query.order_by(FediInstance.modified_at.desc()).first().modified_at
     }
 
     return render_template('simple_index.html', **ctx)

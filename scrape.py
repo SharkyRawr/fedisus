@@ -31,7 +31,7 @@ if __name__ == '__main__':
     from models import FediInstance
     with app.app_context():
         with open('instances.txt') as f:
-            while (line := f.readline().strip()) is not None:
+            while (line := f.readline().strip()) != "":
                 nodeaddress = line
                 ni = get_nodeinfo(nodeaddress)
                 if ni is None:
