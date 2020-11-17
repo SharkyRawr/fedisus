@@ -339,16 +339,22 @@ class Software:
 @dataclass
 class Users:
     total: Optional[int] = None
+    active_month: Optional[int] = None
+    active_half_year: Optional[int] = None
 
     @staticmethod
     def from_dict(obj: Any) -> 'Users':
         assert isinstance(obj, dict)
         total = from_union([from_int, from_none], obj.get("total"))
-        return Users(total)
+        active_month = from_union([from_int, from_none], obj.get("activeMonth"))
+        active_half_year = from_union([from_int, from_none], obj.get("activeHalfyear"))
+        return Users(total, active_month, active_half_year)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["total"] = from_union([from_int, from_none], self.total)
+        result["activeMonth"] = from_union([from_int, from_none], self.active_month)
+        result["activeHalfyear"] = from_union([from_int, from_none], self.active_half_year)
         return result
 
 
