@@ -1,0 +1,144 @@
+{
+    "metadata": {
+        "accountActivationRequired": true,
+        "features": [
+            "pleroma_api",
+            "mastodon_api",
+            "mastodon_api_streaming",
+            "polls",
+            "pleroma_explicit_addressing",
+            "shareable_emoji_packs",
+            "multifetch",
+            "pleroma:api/v1/notifications:include_types_filter",
+            "media_proxy",
+            "chat",
+            "relay",
+            "pleroma_emoji_reactions",
+            "pleroma_chat_messages"
+        ],
+        "federation": {
+            "enabled": true,
+            "exclusions": false,
+            "mrf_object_age": {
+                "actions": [
+                    "delist",
+                    "strip_followers"
+                ],
+                "threshold": 604800
+            },
+            "mrf_policies": [
+                "ObjectAgePolicy",
+                "MediaProxyWarmingPolicy",
+                "SimplePolicy"
+            ],
+            "mrf_simple": {
+                "accept": [],
+                "avatar_removal": [],
+                "banner_removal": [],
+                "federated_timeline_removal": [],
+                "followers_only": [],
+                "media_nsfw": [],
+                "media_removal": [],
+                "reject": [
+                    "baraag.net",
+                    "switter.at",
+                    "freespeechextremist.com"
+                ],
+                "reject_deletes": [],
+                "report_removal": []
+            },
+            "quarantined_instances": []
+        },
+        "fieldsLimits": {
+            "maxFields": 10,
+            "maxRemoteFields": 20,
+            "nameLength": 512,
+            "valueLength": 2048
+        },
+        "invitesEnabled": false,
+        "mailerEnabled": true,
+        "nodeDescription": "Pleroma: An efficient and flexible fediverse server",
+        "nodeName": "CatgirlBiz",
+        "pollLimits": {
+            "max_expiration": 31536000,
+            "max_option_chars": 200,
+            "max_options": 20,
+            "min_expiration": 0
+        },
+        "postFormats": [
+            "text/plain",
+            "text/html",
+            "text/markdown",
+            "text/bbcode"
+        ],
+        "private": false,
+        "restrictedNicknames": [
+            ".well-known",
+            "~",
+            "about",
+            "activities",
+            "api",
+            "auth",
+            "check_password",
+            "dev",
+            "friend-requests",
+            "inbox",
+            "internal",
+            "main",
+            "media",
+            "nodeinfo",
+            "notice",
+            "oauth",
+            "objects",
+            "ostatus_subscribe",
+            "pleroma",
+            "proxy",
+            "push",
+            "registration",
+            "relay",
+            "settings",
+            "status",
+            "tag",
+            "user-search",
+            "user_exists",
+            "users",
+            "web",
+            "sophie",
+            "sharky"
+        ],
+        "skipThreadContainment": true,
+        "staffAccounts": [
+            "https://pleroma.catgirl.biz/users/Sophie",
+            "https://pleroma.catgirl.biz/users/nervous_inhuman"
+        ],
+        "suggestions": {
+            "enabled": false
+        },
+        "uploadLimits": {
+            "avatar": 2000000,
+            "background": 4000000,
+            "banner": 4000000,
+            "general": 16000000
+        }
+    },
+    "openRegistrations": true,
+    "protocols": [
+        "activitypub"
+    ],
+    "services": {
+        "inbound": [],
+        "outbound": []
+    },
+    "software": {
+        "name": "pleroma",
+        "repository": "https://git.pleroma.social/pleroma/pleroma",
+        "version": "2.1.2"
+    },
+    "usage": {
+        "localPosts": 1150,
+        "users": {
+            "total": 4
+        }
+    },
+    "version": "2.1"
+}
