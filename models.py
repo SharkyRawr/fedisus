@@ -61,16 +61,16 @@ class FediInstance(db.Model, TimestampMixin):
                     fi.MRF_Policies = ', '.join(ni.metadata.federation.mrf_policies)
 
                 if ni.metadata.federation.mrf_simple:
-                    fi.MRF_Accept = ', '.join(ni.metadata.federation.mrf_simple.accept) or None
-                    fi.MRF_AvatarRemoval = ', '.join(ni.metadata.federation.mrf_simple.avatar_removal) or None
-                    fi.MRF_BannerRemoval = ', '.join(ni.metadata.federation.mrf_simple.banner_removal) or None
-                    fi.MRF_FediTimelineRemoval = ', '.join(ni.metadata.federation.mrf_simple.federated_timeline_removal) or None
-                    fi.MRF_FollowersOnly = ', '.join(ni.metadata.federation.mrf_simple.followers_only) or None
-                    fi.MRF_MediaNSFW = ', '.join(ni.metadata.federation.mrf_simple.media_nsfw) or None
-                    fi.MRF_MediaRemoval = ', '.join(ni.metadata.federation.mrf_simple.media_removal) or None
-                    fi.MRF_Reject = ', '.join(ni.metadata.federation.mrf_simple.reject) or None
-                    fi.MRF_RejectDeletes = ', '.join(ni.metadata.federation.mrf_simple.reject_deletes) or None
-                    fi.MRF_ReportRemoval = ', '.join(ni.metadata.federation.mrf_simple.report_removal) or None
+                    fi.MRF_Accept = ', '.join(ni.metadata.federation.mrf_simple.accept or []) or None
+                    fi.MRF_AvatarRemoval = ', '.join(ni.metadata.federation.mrf_simple.avatar_removal or []) or None
+                    fi.MRF_BannerRemoval = ', '.join(ni.metadata.federation.mrf_simple.banner_removal or []) or None
+                    fi.MRF_FediTimelineRemoval = ', '.join(ni.metadata.federation.mrf_simple.federated_timeline_removal or []) or None
+                    fi.MRF_FollowersOnly = ', '.join(ni.metadata.federation.mrf_simple.followers_only or []) or None
+                    fi.MRF_MediaNSFW = ', '.join(ni.metadata.federation.mrf_simple.media_nsfw or []) or None
+                    fi.MRF_MediaRemoval = ', '.join(ni.metadata.federation.mrf_simple.media_removal or []) or None
+                    fi.MRF_Reject = ', '.join(ni.metadata.federation.mrf_simple.reject or []) or None
+                    fi.MRF_RejectDeletes = ', '.join(ni.metadata.federation.mrf_simple.reject_deletes or []) or None
+                    fi.MRF_ReportRemoval = ', '.join(ni.metadata.federation.mrf_simple.report_removal or []) or None
 
         return fi
         

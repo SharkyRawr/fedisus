@@ -4,7 +4,6 @@ import json.decoder
 import requests
 import typing
 
-from instances import JUST_A_RANDOM_LIST_OF_INSTANCES
 from quicktype_types import *
 
 NODEINFO_URL = '/nodeinfo/2.0.json'
@@ -31,15 +30,16 @@ if __name__ == '__main__':
     from app import app, db
     from models import FediInstance
     with app.app_context():
+        with open('instances.txt') as f:
+            while (line := f.readline().strip()) is not None:
+                nodeaddress = line
+                ni = get_nodeinfo(nodeaddress)
+                if ni is None:
+                    print("skip invalid request result")
+                    continue
 
-        for nodeaddress in JUST_A_RANDOM_LIST_OF_INSTANCES:
-            ni = get_nodeinfo(nodeaddress)
-            if ni is None:
-                print("skip invalid request result")
-                continue
-
-            fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
-            print('>', nodeaddress, fi.NodeName)
-            db.session.add(fi)
-            db.session.commit()
+                fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
+                print('>', nodeaddress, fi.NodeName)
+                db.session.add(fi)
+                db.session.commit()
 

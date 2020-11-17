@@ -1,0 +1,1 @@
+select distinct regexp_matches(actor, 'https?\://(.*)/users/.*') from pleroma.public.activities 
