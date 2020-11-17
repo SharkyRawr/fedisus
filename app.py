@@ -1,3 +1,4 @@
+import json
 import typing
 from collections import OrderedDict
 from models import FediInstance
@@ -10,13 +11,7 @@ app.config.from_envvar('FEDISUS_CONFIG', True)
 app.config.from_object('settings')
 db.init_app(app)
 
-
-@app.route('/')
-def index():
-
-    with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
-
-    def count_reject_popularity(instances: typing.List[FediInstance]):
+def count_reject_popularity(instances: typing.List[FediInstance], only_more_than_one=True):
         import operator
         r = {}
         for i in instances:
@@ -27,10 +22,16 @@ def index():
                 else:
                     r[reject] = 1
 
-        for k in list(r.keys()):
-            if r[k] <= 1:
-                del r[k]
+        if only_more_than_one:
+            for k in list(r.keys()):
+                if r[k] <= 1:
+                    del r[k]
         return OrderedDict(sorted(r.items(), key=operator.itemgetter(1), reverse=True))
+
+@app.route('/')
+def index():
+
+    with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
 
     ctx = {
         'stats': {
@@ -44,6 +45,18 @@ def index():
     }
 
     return render_template('simple_index.html', **ctx)
+
+
+@app.route('/rejects.json')
+def rejects_json():
+    with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
+    num = with_reject.count()
+
+    reject_stats = count_reject_popularity(with_reject.all(), only_more_than_one=False)
+    res = dict(reject_stats)
+    
+
+    return json.dumps(res)
 
 
 
