@@ -1,1 +1,1 @@
-select distinct regexp_matches(actor, 'https?\://(.*)/users/.*') from pleroma.public.activities 
+select regexp_matches from (select distinct regexp_matches(actor, 'https?\://(.*)/users/.*'), updated_at from pleroma.public.activities order by updated_at desc) as foo
