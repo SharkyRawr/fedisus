@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from flask import Flask, redirect, render_template, request, url_for
 from flask_sqlalchemy import SQLAlchemy
+from flask_compress import Compress
 
 from db import db
 from models import FediInstance
@@ -12,6 +13,7 @@ app = Flask('fedisus')
 app.config.from_envvar('FEDISUS_CONFIG', True)
 app.config.from_object('settings')
 db.init_app(app)
+compress = Compress(app)
 
 
 def count_reject_popularity(instances: typing.List[FediInstance], only_more_than_one=True):
@@ -33,13 +35,15 @@ def count_reject_popularity(instances: typing.List[FediInstance], only_more_than
 
 
 @app.route('/')
+@compress.compressed()
 def index():
 
-    with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
+    with_reject = FediInstance.query.filter(FediInstance.Valid==True, FediInstance.MRF_Reject != None)
 
     ctx = {
         'stats': {
             'numinstances': FediInstance.query.count(),
+            'numvalid': FediInstance.query.filter(FediInstance.Valid==True).count(),
             'nummrf': FediInstance.query.filter(FediInstance.MRF_Policies != None).count(),
             'numreject': with_reject.count(),
         },
@@ -52,8 +56,9 @@ def index():
 
 
 @app.route('/rejects.json')
+@compress.compressed()
 def rejects_json():
-    with_reject = FediInstance.query.filter(FediInstance.MRF_Reject != None)
+    with_reject = FediInstance.query.filter(FediInstance.Valid==True, FediInstance.MRF_Reject != None)
     num = with_reject.count()
 
     reject_stats = count_reject_popularity(with_reject.all(), only_more_than_one=False)
