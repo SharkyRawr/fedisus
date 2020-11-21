@@ -1,10 +1,11 @@
 from db import db
 from quicktype_types import *
+from datetime import datetime
 
 
 class TimestampMixin(object):
-    created_at = db.Column(db.DateTime, server_default=db.func.now(), nullable=False)
-    modified_at = db.Column(db.DateTime, server_default=db.func.now(), onupdate=db.func.current_timestamp(), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    modified_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
 
 class FediInstance(db.Model, TimestampMixin):  
@@ -18,6 +19,7 @@ class FediInstance(db.Model, TimestampMixin):
     SoftwareVersion = db.Column(db.Text)
     NumPosts = db.Column(db.Integer)
     NumUsers = db.Column(db.Integer)
+    Valid = db.Column(db.Boolean, default=True, nullable=False)
 
     __table_args__ = (
         db.UniqueConstraint('Address', 'NodeName', name='uniq_address_nodename'),
@@ -44,6 +46,7 @@ class FediInstance(db.Model, TimestampMixin):
             fi = FediInstance()
 
         fi.Address = address
+        fi.Valid = True
         if ni.metadata:
             if ni.metadata.features:
                 fi.Features = ', '.join(ni.metadata.features)

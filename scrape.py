@@ -1,6 +1,8 @@
 import json
-import json.decoder
+from json.decoder import JSONDecodeError
 
+import sys
+import datetime
 import requests
 import typing
 
@@ -22,7 +24,7 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
             return ni
     except requests.RequestException as rex:
         print(rex)
-    except json.decoder.JSONDecodeError as jsonex:
+    except JSONDecodeError as jsonex:
         print(jsonex)
 
 
@@ -33,9 +35,22 @@ if __name__ == '__main__':
         with open('instances.txt') as f:
             while (line := f.readline().strip()) != "":
                 nodeaddress = line
+
+                # check if instance was scraped recently, last 24 hours (?)
+                fi = FediInstance.query.filter(FediInstance.Address==nodeaddress).first()
+                if fi:
+                    now = datetime.datetime.utcnow()
+                    delta = now - fi.modified_at
+                    if delta.days <= 0:
+                        print("< cached nodeinfo still valid")
+                        continue
+
                 ni = get_nodeinfo(nodeaddress)
                 if ni is None:
-                    print("skip invalid request result")
+                    print("got invalid request result")
+                    fi = FediInstance(Address=nodeaddress, Valid=False)
+                    db.session.add(fi)
+                    db.session.commit()
                     continue
 
                 fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)

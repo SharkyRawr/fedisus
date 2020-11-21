@@ -7,9 +7,12 @@
 
 <p><strong>Last update: {{last_update}}</strong></p>
 
-<p>Number of instances scraped successfully: {{stats.numinstances}}</p>
-<p>Number of instances with MRF policies set: {{stats.nummrf}}</p>
-<p>Number of instances with MRF <i>reject</i> set: {{stats.numreject}}</p>
+<ul>
+    <li>Number of known instances: {{stats.numinstances}}</li>
+    <li>Number of instances scraped successfully: {{stats.numvalid}}</li>
+    <li>Number of instances with MRF policies set: {{stats.nummrf}}</li>
+    <li>Number of instances with MRF <i>reject</i> set: {{stats.numreject}}</li>
+</ul>
 
 <p>Please remember that this is data is scraped from a single source of instance-to-instance interactions: my instance.
     There are a lot more instances that don't show up because I'm just not in indirect contact with anyone on them.<br>
