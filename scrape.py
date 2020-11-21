@@ -42,7 +42,7 @@ if __name__ == '__main__':
                     now = datetime.datetime.utcnow()
                     delta = now - fi.modified_at
                     if delta.days <= 0:
-                        print("< cached nodeinfo still valid")
+                        print("< cached nodeinfo still valid for", nodeaddress)
                         continue
 
                 ni = get_nodeinfo(nodeaddress)
