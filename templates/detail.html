@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+
+{% block body %}
+
+<h1>FediSus<small> - trying to find suspect fediverse instances</small></h1>
+<hr>
+
+<h2>Instance details for: {{i.Address}}</h2>
+<p><strong>Last update: {{i.modified_at}}</strong></p>
+<p>Added to database: {{i.created_at}}</p>
+
+<p>
+    Banned by {{banned_by|count}} instances:
+    <ul>
+        {% for bb in banned_by %}
+        <li>{{bb.Address}}</li>
+        {% endfor %}
+    </ul>
+</p>
+
+<p>Raw info:</p>
+<pre id="what_you_came_here_for">{{ rawinfo }}</pre>
+
+{% endblock %}

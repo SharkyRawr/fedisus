@@ -2,7 +2,7 @@ import json
 import typing
 from collections import OrderedDict
 
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, redirect, render_template, request, url_for, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_compress import Compress
 
@@ -65,6 +65,27 @@ def rejects_json():
     res = dict(reject_stats)
 
     return json.dumps(res)
+
+
+@app.route('/detail/<instance>')
+def details(instance:str):
+    instance = instance.strip()
+    fi = FediInstance.query.filter(FediInstance.Address==instance).first()
+    if fi is None:
+        return "Instance not found or not yet scraped, try again later", 404
+
+    difi = dict(fi.__dict__)
+    difi.pop('_sa_instance_state')
+    difi['modified_at'] = str(difi['modified_at'])
+    difi['created_at'] = str(difi['created_at'])
+
+    ctx = {
+        'i': fi,
+        'banned_by': FediInstance.query.filter(FediInstance.MRF_Reject.contains(fi.Address)).all(),
+        'rawinfo': json.dumps(difi, sort_keys=True, indent=4)
+    }
+
+    return render_template('detail.html', **ctx)
 
 
 if __name__ == '__main__':
