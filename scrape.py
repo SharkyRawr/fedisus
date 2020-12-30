@@ -16,7 +16,7 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
     url = 'https://{}{}'.format(node, NODEINFO_URL)
     
     try:
-        r = requests.get(url, timeout=5)
+        r = requests.get(url, timeout=5, verify=False)
         r.raise_for_status()
         obj = json.loads(r.text)
         if isinstance(obj, dict):
@@ -32,10 +32,11 @@ if __name__ == '__main__':
     from app import app, db
     from models import FediInstance
     with app.app_context():
+        instances = []
         with open('instances.txt') as f:
-            while (line := f.readline().strip()) != "":
-                with tqdm.tqdm() as pb:
-                    nodeaddress = line
+            instances = [a.strip() for a in f.read().replace('\r\n', '\n').split('\n')]
+            with tqdm.tqdm(instances) as pb:
+                for nodeaddress in instances:
                     pb.update()
 
                     # check if instance was scraped recently, last 24 hours (?)
