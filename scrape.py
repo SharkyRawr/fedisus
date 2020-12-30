@@ -5,6 +5,7 @@ import sys
 import datetime
 import requests
 import typing
+import tqdm
 
 from quicktype_types import *
 
@@ -34,27 +35,29 @@ if __name__ == '__main__':
     with app.app_context():
         with open('instances.txt') as f:
             while (line := f.readline().strip()) != "":
-                nodeaddress = line
+                with tqdm.tqdm() as pb:
+                    nodeaddress = line
+                    pb.update()
 
-                # check if instance was scraped recently, last 24 hours (?)
-                fi = FediInstance.query.filter(FediInstance.Address==nodeaddress).first()
-                if fi:
-                    now = datetime.datetime.utcnow()
-                    delta = now - fi.modified_at
-                    if delta.days <= 0:
-                        print("< cached nodeinfo still valid for", nodeaddress)
+                    # check if instance was scraped recently, last 24 hours (?)
+                    fi = FediInstance.query.filter(FediInstance.Address==nodeaddress).first()
+                    if fi:
+                        now = datetime.datetime.utcnow()
+                        delta = now - fi.modified_at
+                        if delta.days <= 0:
+                            pb.write("< cached nodeinfo still valid for " + nodeaddress)
+                            continue
+
+                    ni = get_nodeinfo(nodeaddress)
+                    if ni is None:
+                        pb.write("got invalid request result")
+                        fi = FediInstance(Address=nodeaddress, Valid=False)
+                        db.session.add(fi)
+                        db.session.commit()
                         continue
 
-                ni = get_nodeinfo(nodeaddress)
-                if ni is None:
-                    print("got invalid request result")
-                    fi = FediInstance(Address=nodeaddress, Valid=False)
+                    fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
+                    pb.write('> ' + nodeaddress or "" + " " + fi.NodeName or "")
                     db.session.add(fi)
                     db.session.commit()
-                    continue
-
-                fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
-                print('>', nodeaddress, fi.NodeName)
-                db.session.add(fi)
-                db.session.commit()
 
