@@ -14,7 +14,6 @@ NODEINFO_URL = '/nodeinfo/2.0.json'
 
 def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
     url = 'https://{}{}'.format(node, NODEINFO_URL)
-    print("Trying to fetch:", url)
     
     try:
         r = requests.get(url, timeout=5)
