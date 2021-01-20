@@ -1,3 +1,6 @@
+import urllib3
+urllib3.disable_warnings()
+
 import json
 from json.decoder import JSONDecodeError
 
