@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from db import db
 from quicktype_types import *
-from datetime import datetime
 
 
 class TimestampMixin(object):
@@ -8,7 +9,7 @@ class TimestampMixin(object):
     modified_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
 
-class FediInstance(db.Model, TimestampMixin):  
+class FediInstance(db.Model, TimestampMixin):
     id = db.Column(db.Integer, primary_key=True)
     Address = db.Column(db.String(120), nullable=False)
     Features = db.Column(db.Text)
@@ -25,9 +26,8 @@ class FediInstance(db.Model, TimestampMixin):
         db.UniqueConstraint('Address', 'NodeName', name='uniq_address_nodename'),
     )
 
-
-    MRF_Policies = db.Column(db.Text) # list of active policies
-    MRF_Accept = db.Column(db.Text) # MRF simple stuff etc ...
+    MRF_Policies = db.Column(db.Text)  # list of active policies
+    MRF_Accept = db.Column(db.Text)  # MRF simple stuff etc ...
     MRF_AvatarRemoval = db.Column(db.Text)
     MRF_BannerRemoval = db.Column(db.Text)
     MRF_FediTimelineRemoval = db.Column(db.Text)
@@ -67,7 +67,8 @@ class FediInstance(db.Model, TimestampMixin):
                     fi.MRF_Accept = ', '.join(ni.metadata.federation.mrf_simple.accept or []) or None
                     fi.MRF_AvatarRemoval = ', '.join(ni.metadata.federation.mrf_simple.avatar_removal or []) or None
                     fi.MRF_BannerRemoval = ', '.join(ni.metadata.federation.mrf_simple.banner_removal or []) or None
-                    fi.MRF_FediTimelineRemoval = ', '.join(ni.metadata.federation.mrf_simple.federated_timeline_removal or []) or None
+                    fi.MRF_FediTimelineRemoval = ', '.join(
+                        ni.metadata.federation.mrf_simple.federated_timeline_removal or []) or None
                     fi.MRF_FollowersOnly = ', '.join(ni.metadata.federation.mrf_simple.followers_only or []) or None
                     fi.MRF_MediaNSFW = ', '.join(ni.metadata.federation.mrf_simple.media_nsfw or []) or None
                     fi.MRF_MediaRemoval = ', '.join(ni.metadata.federation.mrf_simple.media_removal or []) or None
@@ -76,5 +77,3 @@ class FediInstance(db.Model, TimestampMixin):
                     fi.MRF_ReportRemoval = ', '.join(ni.metadata.federation.mrf_simple.report_removal or []) or None
 
         return fi
-        
-

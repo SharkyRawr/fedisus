@@ -2,8 +2,7 @@ import json
 import typing
 from collections import OrderedDict
 
-from flask import Flask, redirect, render_template, request, url_for, jsonify
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, render_template
 from flask_compress import Compress
 
 from db import db
@@ -37,13 +36,12 @@ def count_reject_popularity(instances: typing.List[FediInstance], only_more_than
 @app.route('/')
 @compress.compressed()
 def index():
-
-    with_reject = FediInstance.query.filter(FediInstance.Valid==True, FediInstance.MRF_Reject != None)
+    with_reject = FediInstance.query.filter(FediInstance.Valid == True, FediInstance.MRF_Reject != None)
 
     ctx = {
         'stats': {
             'numinstances': FediInstance.query.count(),
-            'numvalid': FediInstance.query.filter(FediInstance.Valid==True).count(),
+            'numvalid': FediInstance.query.filter(FediInstance.Valid == True).count(),
             'nummrf': FediInstance.query.filter(FediInstance.MRF_Policies != None).count(),
             'numreject': with_reject.count(),
         },
@@ -58,7 +56,7 @@ def index():
 @app.route('/rejects.json')
 @compress.compressed()
 def rejects_json():
-    with_reject = FediInstance.query.filter(FediInstance.Valid==True, FediInstance.MRF_Reject != None)
+    with_reject = FediInstance.query.filter(FediInstance.Valid == True, FediInstance.MRF_Reject != None)
     num = with_reject.count()
 
     reject_stats = count_reject_popularity(with_reject.all(), only_more_than_one=False)
@@ -68,9 +66,9 @@ def rejects_json():
 
 
 @app.route('/detail/<instance>')
-def details(instance:str):
+def details(instance: str):
     instance = instance.strip()
-    fi = FediInstance.query.filter(FediInstance.Address==instance).first()
+    fi = FediInstance.query.filter(FediInstance.Address == instance).first()
     if fi is None:
         return "Instance not found or not yet scraped, try again later", 404
 
@@ -90,6 +88,7 @@ def details(instance:str):
 
 if __name__ == '__main__':
     from models import FediInstance
+
     db.init_app(app)
     with app.app_context():
         db.create_all()

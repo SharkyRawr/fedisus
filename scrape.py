@@ -1,10 +1,9 @@
+import datetime
 import json
+import typing
 from json.decoder import JSONDecodeError
 
-import sys
-import datetime
 import requests
-import typing
 
 from quicktype_types import *
 
@@ -14,7 +13,7 @@ NODEINFO_URL = '/nodeinfo/2.0.json'
 def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
     url = 'https://{}{}'.format(node, NODEINFO_URL)
     print("Trying to fetch:", url)
-    
+
     try:
         r = requests.get(url, timeout=5)
         r.raise_for_status()
@@ -31,13 +30,14 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
 if __name__ == '__main__':
     from app import app, db
     from models import FediInstance
+
     with app.app_context():
         with open('instances.txt') as f:
             while (line := f.readline().strip()) != "":
                 nodeaddress = line
 
                 # check if instance was scraped recently, last 24 hours (?)
-                fi = FediInstance.query.filter(FediInstance.Address==nodeaddress).first()
+                fi = FediInstance.query.filter(FediInstance.Address == nodeaddress).first()
                 if fi:
                     now = datetime.datetime.utcnow()
                     delta = now - fi.modified_at
@@ -57,4 +57,3 @@ if __name__ == '__main__':
                 print('>', nodeaddress, fi.NodeName)
                 db.session.add(fi)
                 db.session.commit()
-
