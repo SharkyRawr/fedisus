@@ -1,10 +1,10 @@
 import urllib3
+
 urllib3.disable_warnings()
 
 import json
 from json.decoder import JSONDecodeError
 
-import sys
 import datetime
 import requests
 import typing
@@ -34,6 +34,7 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
 if __name__ == '__main__':
     from app import app, db
     from models import FediInstance
+
     with app.app_context():
         instances = []
         with open('instances.txt') as f:
@@ -43,7 +44,7 @@ if __name__ == '__main__':
                     pb.update()
 
                     # check if instance was scraped recently, last 24 hours (?)
-                    fi = FediInstance.query.filter(FediInstance.Address==nodeaddress).first()
+                    fi = FediInstance.query.filter(FediInstance.Address == nodeaddress).first()
                     if fi:
                         now = datetime.datetime.utcnow()
                         delta = now - fi.modified_at
@@ -63,4 +64,3 @@ if __name__ == '__main__':
                     pb.write('> ' + nodeaddress or "" + " " + fi.NodeName or "")
                     db.session.add(fi)
                     db.session.commit()
-
