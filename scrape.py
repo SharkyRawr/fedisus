@@ -1,3 +1,4 @@
+import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import urllib3
@@ -71,11 +72,22 @@ def scrape_host(nodeaddress: str, pb) -> None:
 
 if __name__ == '__main__':
     instances = []
+    # Get all existing instances
+    with app.app_context():
+        instances += [inst.Address for inst in FediInstance.query.all()]
+    print(instances)
+    # Merge with instances from database
     with open('instances.txt') as f:
-        instances = [a.strip() for a in f.read().replace('\r\n', '\n').split('\n')]
-        with tqdm.tqdm(total=len(instances)) as pb:
-            with ThreadPoolExecutor(max_workers=8) as ex:
-                futures = [ex.submit(scrape_host, url, pb) for url in instances]
-                for future in as_completed(futures):
-                    result = future.result()
-                    pb.update(1)
+        file_instances = [a.strip() for a in f.read().replace('\r\n', '\n').split('\n')]
+        for fi in file_instances:
+            if not fi in instances:
+                instances.append(fi)
+
+    random.shuffle(instances)
+
+    with tqdm.tqdm(total=len(instances)) as pb:
+        with ThreadPoolExecutor(max_workers=8) as ex:
+            futures = [ex.submit(scrape_host, url, pb) for url in instances]
+            for future in as_completed(futures):
+                result = future.result()
+                pb.update(1)
