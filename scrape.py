@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 import urllib3
+
 urllib3.disable_warnings()
 
 import json
@@ -10,6 +11,10 @@ import datetime
 import requests
 import typing
 import tqdm
+import colorama
+
+colorama.init()
+from colorama import Style, Fore
 
 from quicktype_types import *
 
@@ -30,11 +35,11 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
             ni = node_info20_from_dict(obj)
             return ni
     except requests.RequestException as rex:
-        print(rex)
+        print(Style.RESET_ALL + Fore.YELLOW + str(rex) + Style.RESET_ALL)
     except JSONDecodeError as jsonex:
-        print(jsonex)
+        print(Style.RESET_ALL + Fore.RED + str(jsonex) + Style.RESET_ALL)
     except Exception as ex:
-        print(ex)
+        print(Style.RESET_ALL + Fore.RED + str(ex) + Style.RESET_ALL)
 
 
 def scrape_host(nodeaddress: str, pb) -> None:
@@ -45,19 +50,21 @@ def scrape_host(nodeaddress: str, pb) -> None:
             now = datetime.datetime.utcnow()
             delta = now - fi.modified_at
             if delta.days <= 0:
-                pb.write("< cached nodeinfo still valid for " + nodeaddress)
+                pb.write(
+                    Style.RESET_ALL + Fore.BLUE + "< cached nodeinfo still valid for " + nodeaddress + Style.RESET_ALL)
                 return
 
         ni = get_nodeinfo(nodeaddress)
         if ni is None:
-            pb.write("got invalid request result")
+            pb.write(Style.RESET_ALL + Fore.RED + "got invalid request result" + Style.RESET_ALL)
             fi = FediInstance(Address=nodeaddress, Valid=False)
             db.session.add(fi)
             db.session.commit()
             return
 
         fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
-        pb.write('> ' + nodeaddress or "" + " " + fi.NodeName or "")
+        pb.write(
+            Style.RESET_ALL + Fore.GREEN + '> ' + (nodeaddress or "") + " " + (fi.NodeName or "") + Style.RESET_ALL)
         db.session.add(fi)
         db.session.commit()
 

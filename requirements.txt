@@ -1,7 +1,8 @@
-requests>2.25.*
-flask>1.1.*
-Flask-SQLAlchemy>2.4.*
-flask-compress>1.8.*
-psycopg2>2.8.*
-gunicorn>20.*
-tqdm>4.*
+requests~=2.25
+flask~=2.0
+Flask-SQLAlchemy~=2.5
+flask-compress~=1.10
+psycopg2~=2.9
+gunicorn~=20.1
+tqdm~=4.61
+colorama~=0.4
