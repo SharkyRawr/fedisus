@@ -14,7 +14,7 @@
     Banned by {{banned_by|count}} instances:
     <ul>
         {% for bb in banned_by %}
-        <li>{{bb.Address}}</li>
+        <li><a href="{{ url_for ('details', instance=bb.Address) }}">{{bb.Address}}</a></li>
         {% endfor %}
     </ul>
 </p>
