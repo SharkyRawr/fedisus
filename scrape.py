@@ -1,5 +1,6 @@
-import urllib3
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
+import urllib3
 urllib3.disable_warnings()
 
 import json
@@ -11,6 +12,9 @@ import typing
 import tqdm
 
 from quicktype_types import *
+
+from app import app, db
+from models import FediInstance
 
 NODEINFO_URL = '/nodeinfo/2.0.json'
 
@@ -31,36 +35,38 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
         print(jsonex)
 
 
-if __name__ == '__main__':
-    from app import app, db
-    from models import FediInstance
-
+def scrape_host(nodeaddress: str, pb) -> None:
     with app.app_context():
-        instances = []
-        with open('instances.txt') as f:
-            instances = [a.strip() for a in f.read().replace('\r\n', '\n').split('\n')]
-            with tqdm.tqdm(instances) as pb:
-                for nodeaddress in instances:
-                    pb.update()
+        # check if instance was scraped recently, last 24 hours (?)
+        fi = FediInstance.query.filter(FediInstance.Address == nodeaddress).first()
+        if fi:
+            now = datetime.datetime.utcnow()
+            delta = now - fi.modified_at
+            if delta.days <= 0:
+                pb.write("< cached nodeinfo still valid for " + nodeaddress)
+                return
 
-                    # check if instance was scraped recently, last 24 hours (?)
-                    fi = FediInstance.query.filter(FediInstance.Address == nodeaddress).first()
-                    if fi:
-                        now = datetime.datetime.utcnow()
-                        delta = now - fi.modified_at
-                        if delta.days <= 0:
-                            pb.write("< cached nodeinfo still valid for " + nodeaddress)
-                            continue
+        ni = get_nodeinfo(nodeaddress)
+        if ni is None:
+            pb.write("got invalid request result")
+            fi = FediInstance(Address=nodeaddress, Valid=False)
+            db.session.add(fi)
+            db.session.commit()
+            return
 
-                    ni = get_nodeinfo(nodeaddress)
-                    if ni is None:
-                        pb.write("got invalid request result")
-                        fi = FediInstance(Address=nodeaddress, Valid=False)
-                        db.session.add(fi)
-                        db.session.commit()
-                        continue
+        fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
+        pb.write('> ' + nodeaddress or "" + " " + fi.NodeName or "")
+        db.session.add(fi)
+        db.session.commit()
 
-                    fi = FediInstance.get_or_create_from_quicktype(nodeaddress, ni)
-                    pb.write('> ' + nodeaddress or "" + " " + fi.NodeName or "")
-                    db.session.add(fi)
-                    db.session.commit()
+
+if __name__ == '__main__':
+    instances = []
+    with open('instances.txt') as f:
+        instances = [a.strip() for a in f.read().replace('\r\n', '\n').split('\n')]
+        with tqdm.tqdm(total=len(instances)) as pb:
+            with ThreadPoolExecutor(max_workers=8) as ex:
+                futures = [ex.submit(scrape_host, url, pb) for url in instances]
+                for future in as_completed(futures):
+                    result = future.result()
+                    pb.update(1)
