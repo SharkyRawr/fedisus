@@ -19,6 +19,15 @@
     </ul>
 </p>
 
+<p>
+    Banning {{banning|count}} instances:
+    <ul>
+        {% for bb in banning %}
+        <li><a href="{{ url_for ('details', instance=bb) }}">{{bb}}</a></li>
+        {% endfor %}
+    </ul>
+</p>
+
 <p>Raw info:</p>
 <pre id="what_you_came_here_for">{{ rawinfo }}</pre>
 

@@ -77,8 +77,13 @@ def details(instance: str):
     difi['modified_at'] = str(difi['modified_at'])
     difi['created_at'] = str(difi['created_at'])
 
+    banning = []
+    if fi.MRF_Reject is not None and len(fi.MRF_Reject) > 0:
+        banning = fi.MRF_Reject.split(', ')
+
     ctx = {
         'i': fi,
+        'banning': banning,
         'banned_by': FediInstance.query.filter(FediInstance.MRF_Reject.contains(fi.Address)).all(),
         'rawinfo': json.dumps(difi, sort_keys=True, indent=4)
     }
