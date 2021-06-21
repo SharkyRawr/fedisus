@@ -33,6 +33,8 @@ def get_nodeinfo(node: str) -> typing.Optional[NodeInfo20]:
         print(rex)
     except JSONDecodeError as jsonex:
         print(jsonex)
+    except Exception as ex:
+        print(ex)
 
 
 def scrape_host(nodeaddress: str, pb) -> None:
